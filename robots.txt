@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://gilbashah-spicehub.netlify.app/sitemap.xml
+Disallow: /admin.html

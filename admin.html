@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<title>Gilbashah — Admin System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+html,body{-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Lato',sans-serif;background:#0a0500;color:#f5ede0;min-height:100vh;}
+
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#0a0500,#050a02);}
+.login-wrap{width:100%;max-width:380px;padding:20px;}
+.login-card{background:rgba(255,255,255,0.05);border:1px solid rgba(232,160,64,0.25);border-radius:16px;padding:36px 32px;}
+.login-logo{font-family:'Playfair Display',serif;color:#e8a040;font-size:20px;text-align:center;margin-bottom:4px;}
+.login-sub{text-align:center;font-size:10px;color:#6a5848;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.role-tabs{display:flex;border:1px solid rgba(200,120,40,0.2);border-radius:6px;overflow:hidden;margin-bottom:24px;}
+.rtab{flex:1;padding:8px;background:transparent;border:none;color:#8a7060;font-size:11px;cursor:pointer;font-family:'Lato',sans-serif;transition:all 0.2s;letter-spacing:0.5px;}
+.rtab.active{background:rgba(232,160,64,0.15);color:#e8a040;font-weight:700;}
+.lbl{display:block;font-size:10px;color:#8a7060;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.linput{width:100%;background:rgba(255,255,255,0.06);border:1px solid rgba(200,120,40,0.2);color:#f5ede0;padding:11px 13px;border-radius:6px;font-size:13px;font-family:'Lato',sans-serif;margin-bottom:14px;}
+.linput:focus{outline:none;border-color:#e8a040;}
+.lbtn{width:100%;background:#e8a040;color:#0a0500;border:none;border-radius:6px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;}
+.lbtn:hover{background:#f0b050;}
+.lerr{display:none;color:#e87060;font-size:11px;text-align:center;margin-top:8px;}
+.hint{margin-top:14px;font-size:10px;color:#3a2818;text-align:center;line-height:1.6;}
+
+/* DASHBOARD */
+#dashboard{display:none;}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background:rgba(5,3,0,0.97);border-bottom:1px solid rgba(200,120,40,0.15);position:sticky;top:0;z-index:100;}
+.toplogo{font-family:'Playfair Display',serif;color:#e8a040;font-size:16px;}
+.topright{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.rolebadge{font-size:10px;letter-spacing:1px;padding:3px 10px;border-radius:20px;font-weight:700;}
+.badge-super{background:rgba(180,100,255,0.15);border:1px solid rgba(180,100,255,0.3);color:#c080ff;}
+.badge-admin{background:rgba(232,160,64,0.15);border:1px solid rgba(232,160,64,0.3);color:#e8a040;}
+.viewsite-btn{background:transparent;border:1px solid rgba(37,211,102,0.3);color:#25D366;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:'Lato',sans-serif;text-decoration:none;}
+.logoutbtn{background:transparent;border:1px solid rgba(200,120,40,0.2);color:#8a7060;padding:5px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:'Lato',sans-serif;}
+.logoutbtn:hover{border-color:#e8a040;color:#e8a040;}
+
+.layout{display:flex;min-height:calc(100vh - 50px);}
+.sidebar{width:190px;flex-shrink:0;background:rgba(4,2,0,0.8);border-right:1px solid rgba(200,120,40,0.1);padding:14px 0;overflow-y:auto;}
+.sbsec{font-size:9px;color:#4a3828;letter-spacing:2px;text-transform:uppercase;padding:0 14px;margin:16px 0 5px;}
+.sbtn{display:flex;align-items:center;gap:8px;width:100%;background:transparent;border:none;color:#8a7060;font-size:12px;font-family:'Lato',sans-serif;padding:9px 14px;cursor:pointer;text-align:left;transition:all 0.15s;}
+.sbtn:hover{color:#e8a040;background:rgba(232,160,64,0.06);}
+.sbtn.active{color:#e8a040;background:rgba(232,160,64,0.1);border-right:2px solid #e8a040;}
+.sbtn.super-only{color:#c080ff;}
+.sbtn.super-only:hover{color:#d090ff;background:rgba(180,100,255,0.06);}
+.sbtn.super-only.active{color:#d090ff;background:rgba(180,100,255,0.1);border-right-color:#c080ff;}
+
+.main{flex:1;padding:20px;overflow-y:auto;}
+.dpanel{display:none;} .dpanel.active{display:block;}
+
+/* ANALYTICS CARDS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px;}
+.stat-card{background:rgba(255,255,255,0.04);border:1px solid rgba(200,120,40,0.1);border-radius:10px;padding:14px;}
+.stat-ico{font-size:18px;margin-bottom:6px;}
+.stat-num{font-size:24px;font-weight:700;color:#e8a040;line-height:1;}
+.stat-lbl{font-size:11px;color:#8a7060;margin-top:4px;}
+.stat-card.purple .stat-num{color:#c080ff;}
+.stat-card.purple{border-color:rgba(180,100,255,0.15);}
+.stat-card.green .stat-num{color:#25D366;}
+.stat-card.green{border-color:rgba(37,211,102,0.15);}
+
+/* CHARTS / LISTS */
+.panel-block{background:rgba(255,255,255,0.03);border:1px solid rgba(200,120,40,0.1);border-radius:10px;padding:18px;margin-bottom:16px;}
+.pb-title{font-family:'Playfair Display',serif;font-size:16px;color:#f5ede0;margin-bottom:14px;}
+.pb-sub{font-size:11px;color:#6a5848;margin-top:-10px;margin-bottom:14px;}
+
+/* BAR CHART */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.bar-label{font-size:11px;color:#c8a882;min-width:100px;text-align:right;flex-shrink:0;}
+.bar-track{flex:1;background:rgba(255,255,255,0.05);border-radius:4px;height:14px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:4px;background:#e8a040;transition:width 0.6s ease;}
+.bar-fill.purple{background:#c080ff;}
+.bar-fill.green{background:#25D366;}
+.bar-val{font-size:10px;color:#8a7060;min-width:30px;flex-shrink:0;}
+
+/* VISIT CHART */
+.visit-chart{display:flex;align-items:flex-end;gap:4px;height:80px;padding:0 4px;}
+.vc-bar{flex:1;background:rgba(232,160,64,0.2);border-radius:3px 3px 0 0;position:relative;min-height:4px;transition:background 0.2s;cursor:pointer;}
+.vc-bar:hover{background:rgba(232,160,64,0.5);}
+.vc-bar .vc-tip{display:none;position:absolute;bottom:100%;left:50%;transform:translateX(-50%);background:#1a0a00;border:1px solid rgba(232,160,64,0.3);padding:3px 8px;border-radius:4px;font-size:10px;color:#e8a040;white-space:nowrap;margin-bottom:4px;}
+.vc-bar:hover .vc-tip{display:block;}
+.vc-dates{display:flex;gap:4px;margin-top:4px;padding:0 4px;}
+.vc-date{flex:1;font-size:8px;color:#6a5848;text-align:center;}
+
+/* TABLE */
+.dtable{width:100%;border-collapse:collapse;}
+.dtable th{font-size:10px;color:#6a5848;letter-spacing:1.5px;text-transform:uppercase;padding:8px 10px;border-bottom:1px solid rgba(200,120,40,0.1);text-align:left;}
+.dtable td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;color:#c8a882;vertical-align:middle;}
+.dtable tr:hover td{background:rgba(255,255,255,0.02);}
+.ebtn{background:rgba(232,160,64,0.1);border:1px solid rgba(232,160,64,0.25);color:#e8a040;padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Lato',sans-serif;margin-right:4px;}
+.ebtn:hover{background:rgba(232,160,64,0.22);}
+.dbtn{background:rgba(220,60,50,0.1);border:1px solid rgba(220,60,50,0.25);color:#e06050;padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Lato',sans-serif;}
+.dbtn:hover{background:rgba(220,60,50,0.22);}
+.cbtn{background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);color:#25D366;padding:4px 10px;border-radius:4px;font-size:10px;cursor:pointer;font-family:'Lato',sans-serif;margin-right:4px;}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;}
+.pg{background:rgba(37,211,102,0.12);color:#25D366;}
+.pa{background:rgba(232,160,64,0.12);color:#e8a040;}
+.pr{background:rgba(220,60,50,0.12);color:#e06050;}
+.ppu{background:rgba(180,100,255,0.12);color:#c080ff;}
+
+.sechdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.sectitle{font-family:'Playfair Display',serif;font-size:20px;color:#f5ede0;}
+.addbtn{background:#e8a040;color:#0a0500;border:none;border-radius:5px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;}
+.addbtn:hover{background:#f0b050;}
+
+/* ABOUT EDITOR */
+.ablock{background:rgba(255,255,255,0.03);border:1px solid rgba(200,120,40,0.1);border-radius:10px;padding:18px;margin-bottom:14px;}
+.abtitle{font-size:12px;color:#c8a882;font-weight:700;margin-bottom:12px;letter-spacing:0.5px;}
+.frow{margin-bottom:12px;}
+.flbl{display:block;font-size:10px;color:#8a7060;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.finput,.fsel,.ftarea{width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(200,120,40,0.18);color:#f5ede0;padding:9px 11px;border-radius:5px;font-size:12px;font-family:'Lato',sans-serif;}
+.finput:focus,.fsel:focus,.ftarea:focus{outline:none;border-color:#e8a040;}
+.fsel option{background:#0a0500;}
+.ftarea{min-height:80px;resize:vertical;}
+.saverow{display:flex;justify-content:flex-end;margin-top:10px;}
+.isave{background:#e8a040;color:#0a0500;border:none;border-radius:4px;padding:7px 16px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;}
+.toast{display:none;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);color:#25D366;padding:7px 12px;border-radius:5px;font-size:11px;margin-top:8px;text-align:center;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.overlay.show{display:flex;}
+.mbox{background:#130800;border:1px solid rgba(232,160,64,0.25);border-radius:12px;padding:24px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;}
+.mtitle{font-family:'Playfair Display',serif;font-size:18px;color:#f5ede0;margin-bottom:18px;}
+.mfooter{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.msave{background:#e8a040;color:#0a0500;border:none;border-radius:5px;padding:9px 20px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;}
+.mcancel{background:transparent;border:1px solid rgba(200,120,40,0.2);color:#8a7060;border-radius:5px;padding:9px 20px;font-size:12px;cursor:pointer;font-family:'Lato',sans-serif;}
+
+/* ORDER CARDS */
+.ocard{background:rgba(255,255,255,0.03);border:1px solid rgba(200,120,40,0.1);border-radius:9px;padding:14px;margin-bottom:10px;}
+.ocardtop{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.oid{font-size:11px;color:#6a5848;}
+.oinfo{font-size:12px;color:#a89070;line-height:1.7;}
+.oinfo strong{color:#c8a882;}
+.oactions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;}
+
+/* QUICK ACTIONS */
+.qa-grid{display:flex;gap:8px;flex-wrap:wrap;}
+.qabtn{border:none;border-radius:5px;padding:8px 14px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Lato',sans-serif;transition:all 0.2s;}
+.qa-amber{background:rgba(232,160,64,0.12);border:1px solid rgba(232,160,64,0.25);color:#e8a040;}
+.qa-blue{background:rgba(100,150,255,0.1);border:1px solid rgba(100,150,255,0.2);color:#8ab0ff;}
+.qa-green{background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.2);color:#25D366;}
+.qa-purple{background:rgba(180,100,255,0.1);border:1px solid rgba(180,100,255,0.2);color:#c080ff;}
+
+/* ACCESS DENIED */
+.access-denied{text-align:center;padding:60px 20px;color:#6a5848;}
+.access-denied .ad-ico{font-size:48px;margin-bottom:16px;}
+.access-denied h3{font-family:'Playfair Display',serif;font-size:20px;color:#c8a882;margin-bottom:8px;}
+
+@media(max-width:600px){
+  .sidebar{width:160px;}
+  .sbtn{font-size:11px;padding:8px 10px;}
+  .main{padding:14px;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">Gilbashah Spices & Herbs</div>
+      <div class="login-sub">Management System</div>
+      <div class="role-tabs">
+        <button class="rtab active" id="rtab-super" onclick="selectRole('super')">🔮 Super Admin</button>
+        <button class="rtab" id="rtab-admin" onclick="selectRole('admin')">⚙️ Admin</button>
+      </div>
+      <label class="lbl">Username</label>
+      <input class="linput" type="text" id="uname" placeholder="Enter username"/>
+      <label class="lbl">Password</label>
+      <input class="linput" type="password" id="upass" placeholder="••••••••"/>
+      <button class="lbtn" id="loginBtn">Sign In</button>
+      <div class="lerr" id="lerr">Wrong username or password</div>
+      <div class="hint">
+        Super Admin: <strong>superadmin</strong> / <strong>gilbashah@super2026</strong><br>
+        Admin: <strong>admin</strong> / <strong>gilbashah2026</strong><br>
+        ⚠️ Change these before going live!
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="toplogo">Gilbashah Admin</div>
+    <div class="topright">
+      <span class="rolebadge" id="roleBadge">ADMIN</span>
+      <a class="viewsite-btn" href="gibasha_index.html" target="_blank">View Site →</a>
+      <button class="logoutbtn" id="logoutBtn">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar">
+      <!-- Super Admin Only -->
+      <div class="sbsec super-section">🔮 Super Admin</div>
+      <button class="sbtn super-only" data-panel="analytics" data-role="super">📊 Analytics</button>
+      <button class="sbtn super-only" data-panel="visitors" data-role="super">👥 Visitors</button>
+      <button class="sbtn super-only" data-panel="revenue" data-role="super">💰 Revenue</button>
+      <!-- Admin + Super Admin -->
+      <div class="sbsec">⚙️ Content</div>
+      <button class="sbtn" data-panel="overview">🏠 Overview</button>
+      <button class="sbtn" data-panel="spices">🌿 Spices & Herbs</button>
+      <button class="sbtn" data-panel="recipes">🍵 Recipes</button>
+      <button class="sbtn" data-panel="about">📝 About & Contact</button>
+      <div class="sbsec">📦 Business</div>
+      <button class="sbtn" data-panel="orders">📦 Orders</button>
+    </div>
+
+    <div class="main">
+
+      <!-- ═══ ANALYTICS (SUPER ADMIN) ═══ -->
+      <div class="dpanel" id="panel-analytics">
+        <div class="sechdr"><div class="sectitle">📊 Analytics Dashboard</div><button class="addbtn" onclick="refreshAnalytics()">↻ Refresh</button></div>
+        <div class="stat-grid" id="analyticsCards"></div>
+        <div class="panel-block">
+          <div class="pb-title">Visits — Last 7 Days</div>
+          <div class="visit-chart" id="visitChart"></div>
+          <div class="vc-dates" id="visitDates"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+          <div class="panel-block">
+            <div class="pb-title">Most Visited Pages</div>
+            <div id="pageChart"></div>
+          </div>
+          <div class="panel-block">
+            <div class="pb-title">Most Clicked Spices</div>
+            <div id="spiceChart"></div>
+          </div>
+        </div>
+        <div class="panel-block">
+          <div class="pb-title">WhatsApp Engagement</div>
+          <div id="waStats"></div>
+        </div>
+      </div>
+
+      <!-- ═══ VISITORS (SUPER ADMIN) ═══ -->
+      <div class="dpanel" id="panel-visitors">
+        <div class="sechdr"><div class="sectitle">👥 Visitor Insights</div></div>
+        <div class="panel-block">
+          <div class="pb-title">Daily Visit Log</div>
+          <div class="pb-sub">Each time someone opens the site it is recorded</div>
+          <div id="visitorLog"></div>
+        </div>
+        <div class="panel-block">
+          <div class="pb-title">Order History</div>
+          <div id="orderHistory"></div>
+        </div>
+        <div class="panel-block" style="text-align:center;">
+          <div class="pb-title">Reset Analytics Data</div>
+          <p style="font-size:12px;color:#8a7060;margin-bottom:14px;">This will clear all visitor and analytics data from this device.</p>
+          <button class="dbtn" style="font-size:12px;padding:8px 20px;" onclick="resetAnalytics()">🗑 Reset All Analytics</button>
+        </div>
+      </div>
+
+      <!-- ═══ REVENUE (SUPER ADMIN) ═══ -->
+      <div class="dpanel" id="panel-revenue">
+        <div class="sechdr"><div class="sectitle">💰 Revenue Estimates</div></div>
+        <div class="stat-grid" id="revenueCards"></div>
+        <div class="panel-block">
+          <div class="pb-title">Orders by Spice</div>
+          <div id="revenueBySpice"></div>
+        </div>
+        <div class="panel-block">
+          <div class="pb-title">Orders Breakdown</div>
+          <div id="orderBreakdown"></div>
+        </div>
+      </div>
+
+      <!-- ═══ OVERVIEW ═══ -->
+      <div class="dpanel active" id="panel-overview">
+        <div style="margin-bottom:18px;">
+          <div style="font-family:'Playfair Display',serif;font-size:22px;color:#f5ede0;">Welcome back 👋</div>
+          <div style="font-size:12px;color:#6a5848;margin-top:3px;" id="roleGreeting">Gilbashah Spices & Herbs</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-ico">🌿</div><div class="stat-num" id="ov-spices">12</div><div class="stat-lbl">Spices & Herbs</div></div>
+          <div class="stat-card"><div class="stat-ico">🍵</div><div class="stat-num" id="ov-recipes">6</div><div class="stat-lbl">Recipes</div></div>
+          <div class="stat-card"><div class="stat-ico">📦</div><div class="stat-num" id="ov-orders">3</div><div class="stat-lbl">Orders</div></div>
+          <div class="stat-card green"><div class="stat-ico">💬</div><div class="stat-num" style="font-size:13px;margin-top:4px;">0726046572</div><div class="stat-lbl">WhatsApp</div></div>
+        </div>
+        <div class="panel-block">
+          <div class="pb-title" style="margin-bottom:12px;">Quick Actions</div>
+          <div class="qa-grid">
+            <button class="qabtn qa-amber" onclick="activatePanel('spices');openSpiceModal(null)">+ Add Spice/Herb</button>
+            <button class="qabtn qa-blue" onclick="activatePanel('recipes');openRecipeModal(null)">+ Add Recipe</button>
+            <button class="qabtn qa-green" onclick="activatePanel('orders')">View Orders</button>
+            <button class="qabtn qa-blue" onclick="activatePanel('about')">Edit About Us</button>
+            <button class="qabtn qa-purple super-qa" onclick="activatePanel('analytics')">📊 Analytics</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ SPICES & HERBS ═══ -->
+      <div class="dpanel" id="panel-spices">
+        <div class="sechdr"><div class="sectitle">Spices & Herbs</div><button class="addbtn" id="addSpiceBtn">+ Add</button></div>
+        <table class="dtable">
+          <thead><tr><th>Icon</th><th>Name</th><th>Type</th><th>Origin</th><th>KES/kg</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="spiceTbody"></tbody>
+        </table>
+      </div>
+
+      <!-- ═══ RECIPES ═══ -->
+      <div class="dpanel" id="panel-recipes">
+        <div class="sechdr"><div class="sectitle">Recipes</div><button class="addbtn" id="addRecipeBtn">+ Add</button></div>
+        <table class="dtable">
+          <thead><tr><th>Icon</th><th>Title</th><th>Category</th><th>Time</th><th>Steps</th><th>Actions</th></tr></thead>
+          <tbody id="recipeTbody"></tbody>
+        </table>
+      </div>
+
+      <!-- ═══ ABOUT ═══ -->
+      <div class="dpanel" id="panel-about">
+        <div class="sechdr"><div class="sectitle">About Us & Contact</div></div>
+        <div class="ablock">
+          <div class="abtitle">Company Description</div>
+          <div class="frow"><label class="flbl">Headline</label><input class="finput" id="ab-headline" value="At Gilbashah Spices & Herbs, we focus on providing a wide variety of natural spices and herbs for everyday use."/></div>
+          <div class="frow"><label class="flbl">Body Text</label><textarea class="ftarea" id="ab-body">We work closely with trusted sources to ensure our products are fresh, clean, and full of natural flavours.</textarea></div>
+          <div class="saverow"><button class="isave" data-toast="t1">Save Changes</button></div>
+          <div class="toast" id="t1">✓ Saved!</div>
+        </div>
+        <div class="ablock">
+          <div class="abtitle">Contact Information</div>
+          <div class="frow"><label class="flbl">Phone</label><input class="finput" id="ab-phone" value="0726 046 572"/></div>
+          <div class="frow"><label class="flbl">WhatsApp (with country code, no +)</label><input class="finput" id="ab-wa" value="254726046572"/></div>
+          <div class="frow"><label class="flbl">Email</label><input class="finput" id="ab-email" value="gilbashahspices@email.com"/></div>
+          <div class="frow"><label class="flbl">Location</label><input class="finput" id="ab-loc" value="Mombasa, Kenya"/></div>
+          <div class="frow"><label class="flbl">Google Maps Link</label><input class="finput" id="ab-maps" value="https://share.google/GbueNJfPlRM1ZFDKi"/></div>
+          <div class="saverow"><button class="isave" data-toast="t2">Save Changes</button></div>
+          <div class="toast" id="t2">✓ Saved!</div>
+        </div>
+        <div class="ablock">
+          <div class="abtitle">Hero Section</div>
+          <div class="frow"><label class="flbl">Tagline</label><input class="finput" id="ab-tagline" value="Built by community, trusted by industry"/></div>
+          <div class="frow"><label class="flbl">Subtext</label><textarea class="ftarea" id="ab-sub">Gilbashah Spices & Herbs is your trusted source for premium natural spices and herbs.</textarea></div>
+          <div class="saverow"><button class="isave" data-toast="t3">Save Changes</button></div>
+          <div class="toast" id="t3">✓ Saved!</div>
+        </div>
+      </div>
+
+      <!-- ═══ ORDERS ═══ -->
+      <div class="dpanel" id="panel-orders">
+        <div class="sechdr"><div class="sectitle">Orders</div><span style="font-size:11px;color:#6a5848;">Via WhatsApp</span></div>
+        <div id="ordersList"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SPICE MODAL -->
+<div class="overlay" id="spiceOverlay">
+  <div class="mbox">
+    <div class="mtitle" id="spiceModalTitle">Add Spice / Herb</div>
+    <div class="frow"><label class="flbl">Name *</label><input class="finput" id="f-sp-name" placeholder="e.g. Turmeric"/></div>
+    <div class="frow"><label class="flbl">Emoji Icon</label><input class="finput" id="f-sp-ico" placeholder="e.g. 🟡"/></div>
+    <div class="frow"><label class="flbl">Type</label><select class="fsel" id="f-sp-type"><option value="spice">Spice</option><option value="herb">Herb</option><option value="root">Root</option></select></div>
+    <div class="frow"><label class="flbl">Origin</label><input class="finput" id="f-sp-origin" placeholder="e.g. Tanzania"/></div>
+    <div class="frow"><label class="flbl">Price per kg (KES) *</label><input class="finput" type="number" id="f-sp-price" placeholder="e.g. 320"/></div>
+    <div class="frow"><label class="flbl">Description</label><input class="finput" id="f-sp-desc" placeholder="Short description"/></div>
+    <div class="frow"><label class="flbl">Status</label><select class="fsel" id="f-sp-status"><option value="active">Active</option><option value="inactive">Inactive</option></select></div>
+    <div class="mfooter"><button class="mcancel" id="cancelSpice">Cancel</button><button class="msave" id="saveSpiceBtn">Save</button></div>
+  </div>
+</div>
+
+<!-- RECIPE MODAL -->
+<div class="overlay" id="recipeOverlay">
+  <div class="mbox">
+    <div class="mtitle" id="recipeModalTitle">Add Recipe</div>
+    <div class="frow"><label class="flbl">Title *</label><input class="finput" id="f-rc-title" placeholder="e.g. Clove Tea"/></div>
+    <div class="frow"><label class="flbl">Emoji Icon</label><input class="finput" id="f-rc-ico" placeholder="e.g. 🌸"/></div>
+    <div class="frow"><label class="flbl">Category</label><select class="fsel" id="f-rc-cat"><option value="Drink">Drink</option><option value="Food">Food</option><option value="Remedy">Remedy</option></select></div>
+    <div class="frow"><label class="flbl">Cook Time</label><input class="finput" id="f-rc-time" placeholder="e.g. 10–15 min"/></div>
+    <div class="frow"><label class="flbl">Steps (one per line)</label><textarea class="ftarea" id="f-rc-steps" placeholder="Boil 2 cups water&#10;Add cloves&#10;Simmer 5 min&#10;Strain and serve"></textarea></div>
+    <div class="frow"><label class="flbl">Optional Tip</label><input class="finput" id="f-rc-optional" placeholder="e.g. Add honey or lemon"/></div>
+    <div class="mfooter"><button class="mcancel" id="cancelRecipe">Cancel</button><button class="msave" id="saveRecipeBtn">Save</button></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// CREDENTIALS & ROLES
+// ═══════════════════════════════════════════════════
+var CREDS = {
+  superadmin: { pass:'gilbashah@super2026', role:'super', label:'SUPER ADMIN' },
+  admin:      { pass:'gilbashah2026',       role:'admin', label:'ADMIN' }
+};
+var currentRole = 'admin';
+var selectedRole = 'super';
+
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+var SH=[
+  {id:1,name:'Cardamom',ico:'🌿',type:'spice',origin:'Uganda',price:800,desc:'Aromatic spice used in teas and curries',status:'active'},
+  {id:2,name:'Turmeric',ico:'🟡',type:'root',origin:'Tanzania',price:320,desc:'Golden root with anti-inflammatory benefits',status:'active'},
+  {id:3,name:'Black Pepper',ico:'⚫',type:'spice',origin:'Mombasa',price:450,desc:'King of spices',status:'active'},
+  {id:4,name:'Cinnamon',ico:'🤎',type:'spice',origin:'Madagascar',price:380,desc:'Sweet, warming spice',status:'active'},
+  {id:5,name:'Cloves',ico:'🌸',type:'spice',origin:'Zanzibar',price:1200,desc:'Intensely flavoured with medicinal uses',status:'active'},
+  {id:6,name:'Cumin',ico:'🟠',type:'spice',origin:'Ethiopia',price:360,desc:'Earthy spice for East African cooking',status:'active'},
+  {id:7,name:'Coriander',ico:'🟤',type:'herb',origin:'Kenya',price:280,desc:'Versatile herb and spice',status:'active'},
+  {id:8,name:'Pilipili',ico:'🌶️',type:'spice',origin:'Coastal Kenya',price:300,desc:'East African chilli',status:'active'},
+  {id:9,name:'Ginger',ico:'🫚',type:'root',origin:'East Africa',price:250,desc:'Fresh root with immune benefits',status:'active'},
+  {id:10,name:'Stinging Nettle',ico:'🌱',type:'herb',origin:'Kenya Highlands',price:420,desc:'Nutrient-rich herb',status:'active'},
+  {id:11,name:'Lemongrass',ico:'🌾',type:'herb',origin:'Coastal Kenya',price:200,desc:'Fragrant herb for teas and soups',status:'active'},
+  {id:12,name:'Moringa',ico:'💚',type:'herb',origin:'Kenya',price:350,desc:'Superfood miracle tree herb',status:'active'}
+];
+var RECIPES=[
+  {id:1,title:'Clove Tea',ico:'🌸',category:'Drink',time:'10–15 min',steps:['Bring 2 cups of water to a full boil','Add 1–2 teaspoons of whole cloves','Reduce heat and simmer for 5–10 minutes','Strain and pour into a mug'],optional:'Add honey, lemon, or cinnamon'},
+  {id:2,title:'Golden Turmeric Milk',ico:'🟡',category:'Drink',time:'8 min',steps:['Warm 1 cup of milk','Stir in turmeric, cinnamon, black pepper','Add honey to taste','Serve warm'],optional:'Add fresh ginger for extra warmth'},
+  {id:3,title:'Ginger Lemon Detox Tea',ico:'🫚',category:'Drink',time:'10 min',steps:['Boil 2 cups water','Add grated ginger, simmer 5 min','Squeeze in lemon juice','Strain and serve'],optional:'Add honey and cayenne'},
+  {id:4,title:'Cardamom Coffee',ico:'🌿',category:'Drink',time:'5 min',steps:['Brew your coffee','Stir in ground cardamom','Sweeten to taste'],optional:'Sprinkle cinnamon on top'},
+  {id:5,title:'Pilipili Mango Salsa',ico:'🌶️',category:'Food',time:'10 min',steps:['Dice 2 ripe mangoes','Add pilipili, lime juice','Mix in onion and coriander','Toss and serve'],optional:'Add a pinch of cumin'},
+  {id:6,title:'Moringa Smoothie',ico:'💚',category:'Drink',time:'5 min',steps:['Add moringa to blender','Add banana, spinach, water','Blend until smooth','Serve immediately'],optional:'Add lemon and honey'}
+];
+var ORDERS=[
+  {id:'ORD-001',customer:'Jane Wanjiku',phone:'0712 345 678',items:'Turmeric 250g, Cloves 100g',delivery:'Pickup',total:'KES 200',status:'pending',time:'2026-03-20 19:42'},
+  {id:'ORD-002',customer:'Ahmed Hassan',phone:'0734 567 890',items:'Cardamom 1kg, Ginger 500g',delivery:'Delivery',total:'KES 925',status:'confirmed',time:'2026-03-20 18:15'},
+  {id:'ORD-003',customer:'Mary Odhiambo',phone:'0756 789 012',items:'Moringa 200g, Turmeric 500g',delivery:'Pickup',total:'KES 230',status:'pending',time:'2026-03-20 17:30'}
+];
+var nextId=300;
+var editingSpiceId=null, editingRecipeId=null;
+
+// ═══════════════════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════════════════
+function selectRole(r){
+  selectedRole=r;
+  document.getElementById('rtab-super').classList.toggle('active',r==='super');
+  document.getElementById('rtab-admin').classList.toggle('active',r==='admin');
+}
+
+document.getElementById('loginBtn').addEventListener('click', function(){
+  var u=document.getElementById('uname').value.trim().toLowerCase();
+  var p=document.getElementById('upass').value.trim();
+  if(CREDS[u] && CREDS[u].pass===p){
+    currentRole = CREDS[u].role;
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    initDash();
+  } else {
+    var e=document.getElementById('lerr');
+    e.style.display='block';
+    setTimeout(function(){e.style.display='none';},3000);
+  }
+});
+document.getElementById('upass').addEventListener('keydown',function(e){if(e.key==='Enter')document.getElementById('loginBtn').click();});
+document.getElementById('logoutBtn').addEventListener('click',function(){
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('uname').value='';
+  document.getElementById('upass').value='';
+});
+
+// ═══════════════════════════════════════════════════
+// INIT DASHBOARD
+// ═══════════════════════════════════════════════════
+function initDash(){
+  // Set role badge
+  var badge=document.getElementById('roleBadge');
+  badge.textContent=currentRole==='super'?'SUPER ADMIN':'ADMIN';
+  badge.className='rolebadge '+(currentRole==='super'?'badge-super':'badge-admin');
+  document.getElementById('roleGreeting').textContent=currentRole==='super'?'Super Admin — Full Access':'Admin — Content Management';
+
+  // Show/hide super-only sidebar items
+  document.querySelectorAll('.sbtn[data-role="super"]').forEach(function(b){
+    b.style.display=currentRole==='super'?'flex':'none';
+  });
+  document.querySelectorAll('.super-section').forEach(function(s){
+    s.style.display=currentRole==='super'?'block':'none';
+  });
+  document.querySelectorAll('.super-qa').forEach(function(b){
+    b.style.display=currentRole==='super'?'inline-block':'none';
+  });
+
+  renderSpices(); renderRecipes(); renderOrders(); updateOv();
+  if(currentRole==='super') refreshAnalytics();
+  activatePanel('overview');
+}
+
+function updateOv(){
+  document.getElementById('ov-spices').textContent=SH.length;
+  document.getElementById('ov-recipes').textContent=RECIPES.length;
+  document.getElementById('ov-orders').textContent=ORDERS.length;
+}
+
+// ═══════════════════════════════════════════════════
+// PANEL NAVIGATION
+// ═══════════════════════════════════════════════════
+document.querySelectorAll('.sbtn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    activatePanel(this.getAttribute('data-panel'));
+  });
+});
+
+function activatePanel(name){
+  // Check super-only access
+  var superOnly=['analytics','visitors','revenue'];
+  if(superOnly.includes(name) && currentRole!=='super'){
+    document.querySelectorAll('.dpanel').forEach(function(p){p.classList.remove('active');});
+    document.querySelectorAll('.sbtn').forEach(function(b){b.classList.remove('active');});
+    var d=document.getElementById('panel-'+name);
+    if(d){
+      d.innerHTML='<div class="access-denied"><div class="ad-ico">🔒</div><h3>Super Admin Only</h3><p style="font-size:13px;color:#6a5848;">This section requires Super Admin access.<br>Please log in as Super Admin to view analytics.</p></div>';
+      d.classList.add('active');
+    }
+    return;
+  }
+  document.querySelectorAll('.dpanel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.sbtn').forEach(function(b){b.classList.remove('active');});
+  var panel=document.getElementById('panel-'+name);
+  if(panel) panel.classList.add('active');
+  var btn=document.querySelector('[data-panel="'+name+'"]');
+  if(btn) btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════
+// ANALYTICS
+// ═══════════════════════════════════════════════════
+function getStats(){
+  try{ return JSON.parse(localStorage.getItem('gilb_stats')||'{}'); }catch(e){return {};}
+}
+
+function refreshAnalytics(){
+  var s=getStats();
+  var visits=s.visits||{};
+  var pages=s.pages||{};
+  var waClicks=s.waClicks||0;
+  var spiceClicks=s.spiceClicks||{};
+  var events=s.events||[];
+
+  // Total visits
+  var totalVisits=Object.values(visits).reduce(function(a,b){return a+b;},0);
+  var totalOrders=events.filter(function(e){return e.type==='order';}).length;
+
+  // Cards
+  document.getElementById('analyticsCards').innerHTML=[
+    {ico:'👥',num:totalVisits,lbl:'Total Visits',cls:''},
+    {ico:'💬',num:waClicks,lbl:'WhatsApp Clicks',cls:'green'},
+    {ico:'📦',num:totalOrders,lbl:'Orders Sent',cls:'purple'},
+    {ico:'🌿',num:Object.keys(spiceClicks).length,lbl:'Spices Viewed',cls:''}
+  ].map(function(c){
+    return '<div class="stat-card '+c.cls+'"><div class="stat-ico">'+c.ico+'</div><div class="stat-num">'+c.num+'</div><div class="stat-lbl">'+c.lbl+'</div></div>';
+  }).join('');
+
+  // Visit chart — last 7 days
+  var days=[];
+  for(var i=6;i>=0;i--){
+    var d=new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  var maxV=Math.max.apply(null,days.map(function(d){return visits[d]||0;}));
+  if(maxV===0) maxV=1;
+  document.getElementById('visitChart').innerHTML=days.map(function(d){
+    var v=visits[d]||0;
+    var h=Math.max(4,Math.round((v/maxV)*76));
+    return '<div class="vc-bar" style="height:'+h+'px"><div class="vc-tip">'+v+' visits</div></div>';
+  }).join('');
+  document.getElementById('visitDates').innerHTML=days.map(function(d){
+    return '<div class="vc-date">'+d.slice(5)+'</div>';
+  }).join('');
+
+  // Pages
+  var pageEntries=Object.entries(pages).sort(function(a,b){return b[1]-a[1];}).slice(0,6);
+  var maxP=pageEntries.length?pageEntries[0][1]:1;
+  document.getElementById('pageChart').innerHTML=pageEntries.length?pageEntries.map(function(e){
+    var pct=Math.round((e[1]/maxP)*100);
+    return '<div class="bar-row"><div class="bar-label">'+e[0]+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%"></div></div><div class="bar-val">'+e[1]+'</div></div>';
+  }).join(''):'<div style="color:#6a5848;font-size:12px;">No page data yet. Share your site link!</div>';
+
+  // Spice clicks
+  var spiceEntries=Object.entries(spiceClicks).sort(function(a,b){return b[1]-a[1];}).slice(0,6);
+  var maxSp=spiceEntries.length?spiceEntries[0][1]:1;
+  document.getElementById('spiceChart').innerHTML=spiceEntries.length?spiceEntries.map(function(e){
+    var pct=Math.round((e[1]/maxSp)*100);
+    return '<div class="bar-row"><div class="bar-label">'+e[0]+'</div><div class="bar-track"><div class="bar-fill purple" style="width:'+pct+'%"></div></div><div class="bar-val">'+e[1]+'</div></div>';
+  }).join(''):'<div style="color:#6a5848;font-size:12px;">No spice clicks yet.</div>';
+
+  // WA stats
+  document.getElementById('waStats').innerHTML='<div class="bar-row"><div class="bar-label">WA Clicks</div><div class="bar-track"><div class="bar-fill green" style="width:100%"></div></div><div class="bar-val">'+waClicks+'</div></div>'+
+  '<div class="bar-row"><div class="bar-label">Orders Sent</div><div class="bar-track"><div class="bar-fill green" style="width:'+(totalOrders>0?Math.round((totalOrders/Math.max(waClicks,1))*100):0)+'%"></div></div><div class="bar-val">'+totalOrders+'</div></div>';
+
+  // Visitors log
+  renderVisitorLog(visits, events);
+  renderRevenue(events);
+}
+
+function renderVisitorLog(visits, events){
+  var entries=Object.entries(visits).sort(function(a,b){return b[0].localeCompare(a[0]);});
+  document.getElementById('visitorLog').innerHTML=entries.length?
+    '<table class="dtable"><thead><tr><th>Date</th><th>Visits</th></tr></thead><tbody>'+
+    entries.map(function(e){return '<tr><td>'+e[0]+'</td><td><span class="pill pg">'+e[1]+'</span></td></tr>';}).join('')+
+    '</tbody></table>':'<div style="color:#6a5848;font-size:12px;padding:10px 0;">No visit data yet. Share your site to start collecting data!</div>';
+
+  document.getElementById('orderHistory').innerHTML=events.length?
+    '<table class="dtable"><thead><tr><th>Time</th><th>Items</th></tr></thead><tbody>'+
+    events.slice().reverse().map(function(e){return '<tr><td style="font-size:10px;">'+new Date(e.time).toLocaleString()+'</td><td>'+e.items.join(', ')+'</td></tr>';}).join('')+
+    '</tbody></table>':'<div style="color:#6a5848;font-size:12px;padding:10px 0;">No orders sent yet via this device.</div>';
+}
+
+function renderRevenue(events){
+  var total=ORDERS.reduce(function(s,o){return s+parseInt(o.total.replace(/[^0-9]/g,''));},0);
+  var pending=ORDERS.filter(function(o){return o.status==='pending';}).length;
+  var confirmed=ORDERS.filter(function(o){return o.status==='confirmed';}).length;
+  document.getElementById('revenueCards').innerHTML=[
+    {ico:'💰',num:'KES '+total.toLocaleString(),lbl:'Total Order Value',cls:''},
+    {ico:'⏳',num:pending,lbl:'Pending Orders',cls:''},
+    {ico:'✅',num:confirmed,lbl:'Confirmed Orders',cls:'green'},
+    {ico:'📦',num:ORDERS.length,lbl:'Total Orders',cls:'purple'}
+  ].map(function(c){
+    return '<div class="stat-card '+c.cls+'"><div class="stat-ico">'+c.ico+'</div><div class="stat-num">'+c.num+'</div><div class="stat-lbl">'+c.lbl+'</div></div>';
+  }).join('');
+
+  // Orders by spice from ORDERS
+  var spiceRev={};
+  ORDERS.forEach(function(o){
+    o.items.split(',').forEach(function(item){spiceRev[item.trim()]=(spiceRev[item.trim()]||0)+1;});
+  });
+  var entries=Object.entries(spiceRev).sort(function(a,b){return b[1]-a[1];});
+  document.getElementById('revenueBySpice').innerHTML=entries.length?entries.map(function(e){
+    return '<div class="bar-row"><div class="bar-label" style="font-size:10px;">'+e[0]+'</div><div class="bar-track"><div class="bar-fill" style="width:'+(e[1]/entries[0][1]*100)+'%"></div></div><div class="bar-val">'+e[1]+'x</div></div>';
+  }).join(''):'<div style="color:#6a5848;font-size:12px;">No order data yet.</div>';
+
+  document.getElementById('orderBreakdown').innerHTML='<table class="dtable"><thead><tr><th>ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>'+
+    ORDERS.map(function(o){return '<tr><td>'+o.id+'</td><td>'+o.customer+'</td><td style="font-size:10px;">'+o.items+'</td><td style="color:#e8a040;font-weight:700;">'+o.total+'</td><td><span class="pill '+(o.status==='confirmed'?'pg':o.status==='cancelled'?'pr':'pa')+'">'+o.status+'</span></td></tr>';}).join('')+
+    '</tbody></table>';
+}
+
+function resetAnalytics(){
+  if(confirm('Reset ALL analytics data? This cannot be undone.')){
+    localStorage.removeItem('gilb_stats');
+    refreshAnalytics();
+    alert('Analytics data cleared.');
+  }
+}
+
+// ═══════════════════════════════════════════════════
+// SPICES
+// ═══════════════════════════════════════════════════
+function renderSpices(){
+  var tb=document.getElementById('spiceTbody');
+  if(SH.length===0){tb.innerHTML='<tr><td colspan="7" style="color:#6a5848;text-align:center;padding:16px;">No spices yet.</td></tr>';updateOv();return;}
+  tb.innerHTML=SH.map(function(s){
+    return '<tr><td style="font-size:18px">'+s.ico+'</td><td style="color:#f5ede0;font-weight:700;">'+s.name+'</td><td><span class="pill pa">'+s.type+'</span></td><td>'+s.origin+'</td><td style="color:#e8a040;font-weight:700;">'+Number(s.price).toLocaleString()+'</td><td><span class="pill '+(s.status==='active'?'pg':'pr')+'">'+s.status+'</span></td><td><button class="ebtn" onclick="editSpice('+s.id+')">✏️</button><button class="dbtn" onclick="deleteSpice('+s.id+')">🗑</button></td></tr>';
+  }).join('');
+  updateOv();
+}
+document.getElementById('addSpiceBtn').addEventListener('click',function(){openSpiceModal(null);});
+function openSpiceModal(id){
+  editingSpiceId=id;
+  if(id!==null){
+    var s=SH.find(function(x){return x.id===id;});
+    document.getElementById('spiceModalTitle').textContent='Edit Spice / Herb';
+    document.getElementById('f-sp-name').value=s.name;document.getElementById('f-sp-ico').value=s.ico;
+    document.getElementById('f-sp-type').value=s.type;document.getElementById('f-sp-origin').value=s.origin;
+    document.getElementById('f-sp-price').value=s.price;document.getElementById('f-sp-desc').value=s.desc||'';
+    document.getElementById('f-sp-status').value=s.status||'active';
+  } else {
+    document.getElementById('spiceModalTitle').textContent='Add New Spice / Herb';
+    ['f-sp-name','f-sp-ico','f-sp-origin','f-sp-price','f-sp-desc'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('f-sp-type').value='spice';document.getElementById('f-sp-status').value='active';
+  }
+  document.getElementById('spiceOverlay').classList.add('show');
+  setTimeout(function(){document.getElementById('f-sp-name').focus();},100);
+}
+function editSpice(id){openSpiceModal(id);}
+function deleteSpice(id){var s=SH.find(function(x){return x.id===id;});if(s&&confirm('Delete "'+s.name+'"?')){SH.splice(SH.findIndex(function(x){return x.id===id;}),1);renderSpices();}}
+document.getElementById('saveSpiceBtn').addEventListener('click',function(){
+  var name=document.getElementById('f-sp-name').value.trim();
+  var price=document.getElementById('f-sp-price').value.trim();
+  if(!name){alert('Please enter a name.');return;}
+  if(!price||isNaN(price)){alert('Please enter a valid price.');return;}
+  var data={name:name,ico:document.getElementById('f-sp-ico').value.trim()||'🌿',type:document.getElementById('f-sp-type').value,origin:document.getElementById('f-sp-origin').value.trim()||'Kenya',price:parseInt(price),desc:document.getElementById('f-sp-desc').value.trim(),status:document.getElementById('f-sp-status').value};
+  if(editingSpiceId!==null){var idx=SH.findIndex(function(s){return s.id===editingSpiceId;});SH[idx]=Object.assign({},SH[idx],data);}
+  else{data.id=++nextId;SH.push(data);}
+  document.getElementById('spiceOverlay').classList.remove('show');renderSpices();
+});
+document.getElementById('cancelSpice').addEventListener('click',function(){document.getElementById('spiceOverlay').classList.remove('show');});
+document.getElementById('spiceOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+
+// ═══════════════════════════════════════════════════
+// RECIPES
+// ═══════════════════════════════════════════════════
+function renderRecipes(){
+  var tb=document.getElementById('recipeTbody');
+  if(RECIPES.length===0){tb.innerHTML='<tr><td colspan="6" style="color:#6a5848;text-align:center;padding:16px;">No recipes yet.</td></tr>';updateOv();return;}
+  tb.innerHTML=RECIPES.map(function(r){
+    var steps=Array.isArray(r.steps)?r.steps.length:(r.steps||'').split('\n').length;
+    return '<tr><td style="font-size:18px">'+r.ico+'</td><td style="color:#f5ede0;font-weight:700;">'+r.title+'</td><td><span class="pill pg">'+r.category+'</span></td><td><span class="pill pa">'+r.time+'</span></td><td style="color:#8a7060;">'+steps+' steps</td><td><button class="ebtn" onclick="editRecipe('+r.id+')">✏️</button><button class="dbtn" onclick="deleteRecipe('+r.id+')">🗑</button></td></tr>';
+  }).join('');
+  updateOv();
+}
+document.getElementById('addRecipeBtn').addEventListener('click',function(){openRecipeModal(null);});
+function openRecipeModal(id){
+  editingRecipeId=id;
+  if(id!==null){
+    var r=RECIPES.find(function(x){return x.id===id;});
+    document.getElementById('recipeModalTitle').textContent='Edit Recipe';
+    document.getElementById('f-rc-title').value=r.title;document.getElementById('f-rc-ico').value=r.ico;
+    document.getElementById('f-rc-cat').value=r.category||'Drink';document.getElementById('f-rc-time').value=r.time;
+    document.getElementById('f-rc-steps').value=Array.isArray(r.steps)?r.steps.join('\n'):r.steps;
+    document.getElementById('f-rc-optional').value=r.optional;
+  } else {
+    document.getElementById('recipeModalTitle').textContent='Add New Recipe';
+    ['f-rc-title','f-rc-ico','f-rc-time','f-rc-steps','f-rc-optional'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('f-rc-cat').value='Drink';
+  }
+  document.getElementById('recipeOverlay').classList.add('show');
+  setTimeout(function(){document.getElementById('f-rc-title').focus();},100);
+}
+function editRecipe(id){openRecipeModal(id);}
+function deleteRecipe(id){var r=RECIPES.find(function(x){return x.id===id;});if(r&&confirm('Delete "'+r.title+'"?')){RECIPES.splice(RECIPES.findIndex(function(x){return x.id===id;}),1);renderRecipes();}}
+document.getElementById('saveRecipeBtn').addEventListener('click',function(){
+  var title=document.getElementById('f-rc-title').value.trim();
+  if(!title){alert('Please enter a title.');return;}
+  var data={title:title,ico:document.getElementById('f-rc-ico').value.trim()||'🍵',category:document.getElementById('f-rc-cat').value,time:document.getElementById('f-rc-time').value.trim()||'10 min',steps:document.getElementById('f-rc-steps').value.trim().split('\n').filter(function(s){return s.trim();}),optional:document.getElementById('f-rc-optional').value.trim()};
+  if(editingRecipeId!==null){var idx=RECIPES.findIndex(function(r){return r.id===editingRecipeId;});RECIPES[idx]=Object.assign({},RECIPES[idx],data);}
+  else{data.id=++nextId;RECIPES.push(data);}
+  document.getElementById('recipeOverlay').classList.remove('show');renderRecipes();
+});
+document.getElementById('cancelRecipe').addEventListener('click',function(){document.getElementById('recipeOverlay').classList.remove('show');});
+document.getElementById('recipeOverlay').addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+
+// ═══════════════════════════════════════════════════
+// ABOUT SAVE
+// ═══════════════════════════════════════════════════
+document.querySelectorAll('.isave').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var tid=this.getAttribute('data-toast');
+    var t=document.getElementById(tid);
+    t.style.display='block';
+    setTimeout(function(){t.style.display='none';},2500);
+  });
+});
+
+// ═══════════════════════════════════════════════════
+// ORDERS
+// ═══════════════════════════════════════════════════
+function renderOrders(){
+  var cont=document.getElementById('ordersList');
+  if(ORDERS.length===0){cont.innerHTML='<div style="color:#6a5848;font-size:13px;padding:16px;text-align:center;">No orders yet.</div>';updateOv();return;}
+  cont.innerHTML=ORDERS.map(function(o){
+    var pc=o.status==='confirmed'?'pg':o.status==='cancelled'?'pr':'pa';
+    return '<div class="ocard">'+
+      '<div class="ocardtop"><div><div class="oid">'+o.id+' · '+o.time+'</div><div style="font-size:13px;color:#f5ede0;font-weight:700;margin-top:2px;">'+o.customer+'</div></div><span class="pill '+pc+'">'+o.status+'</span></div>'+
+      '<div class="oinfo"><strong>Phone:</strong> '+o.phone+' &nbsp;|&nbsp; <strong>Items:</strong> '+o.items+' &nbsp;|&nbsp; <strong>Delivery:</strong> '+o.delivery+' &nbsp;|&nbsp; <strong>Total:</strong> <span style="color:#e8a040;font-weight:700;">'+o.total+'</span></div>'+
+      '<div class="oactions">'+
+        '<button class="cbtn" onclick="confirmOrder(\''+o.id+'\')">✓ Confirm</button>'+
+        '<button class="ebtn" onclick="window.open(\'https://wa.me/254726046572\',\'_blank\')">💬 WhatsApp</button>'+
+        '<button class="dbtn" onclick="removeOrder(\''+o.id+'\')">🗑 Remove</button>'+
+      '</div></div>';
+  }).join('');
+  updateOv();
+}
+function confirmOrder(id){var o=ORDERS.find(function(x){return x.id===id;});if(o){o.status='confirmed';renderOrders();if(currentRole==='super')refreshAnalytics();}}
+function removeOrder(id){var o=ORDERS.find(function(x){return x.id===id;});if(o&&confirm('Remove order '+id+'?')){ORDERS.splice(ORDERS.findIndex(function(x){return x.id===id;}),1);renderOrders();}}
+</script>
+</body>
+</html>
